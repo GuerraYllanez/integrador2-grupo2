@@ -1,0 +1,195 @@
+.marketing-form-page {
+  min-height: calc(100vh - 70px);
+  padding: 28px;
+  background: #f8fafc;
+  box-sizing: border-box;
+}
+
+.marketing-form-header {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto 24px;
+}
+
+.marketing-form-header h1 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.marketing-form-header p {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 15px;
+}
+
+.marketing-form-card {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 28px;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.05);
+}
+
+.marketing-form-alert {
+  margin-bottom: 22px;
+  padding: 13px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #b91c1c;
+  font-size: 14px;
+}
+
+.marketing-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.marketing-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.marketing-form-field-full {
+  grid-column: 1 / -1;
+}
+
+.marketing-form-field label {
+  color: #334155;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.marketing-form-field input[type="text"],
+.marketing-form-field input[type="date"],
+.marketing-form-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e293b;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.marketing-form-field textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.marketing-form-field input:focus,
+.marketing-form-field textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.marketing-form-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+}
+
+.marketing-form-checkbox input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.marketing-form-checkbox span {
+  color: #475569;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.marketing-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.marketing-form-btn {
+  min-width: 140px;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.marketing-form-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.marketing-form-btn-secondary {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.marketing-form-btn-secondary:hover:not(:disabled) {
+  background: #f8fafc;
+}
+
+.marketing-form-btn-primary {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.marketing-form-btn-primary:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.marketing-form-loading {
+  padding: 40px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+}
+
+@media (max-width: 700px) {
+  .marketing-form-page {
+    padding: 18px;
+  }
+
+  .marketing-form-card {
+    padding: 20px;
+  }
+
+  .marketing-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .marketing-form-field-full {
+    grid-column: auto;
+  }
+
+  .marketing-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .marketing-form-btn {
+    width: 100%;
+  }
+}

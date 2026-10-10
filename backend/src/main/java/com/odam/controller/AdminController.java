@@ -1,0 +1,2 @@
+package com.odam.controller; import org.springframework.security.access.prepost.PreAuthorize; import org.springframework.web.bind.annotation.*; import java.util.Map;
+@RestController @RequestMapping("/api/admin") public class AdminController { @GetMapping("/panel") @PreAuthorize("hasRole('ADMINISTRADOR')") public Map<String,Object> panel(){return Map.of("ok",true,"mensaje","Panel administrativo autorizado");} }

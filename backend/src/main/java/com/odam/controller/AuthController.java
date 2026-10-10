@@ -1,0 +1,3 @@
+package com.odam.controller;
+import com.odam.dto.*; import com.odam.service.AuthService; import jakarta.validation.Valid; import org.springframework.http.*; import org.springframework.web.bind.annotation.*;
+@RestController @RequestMapping("/api/auth") public class AuthController { private final AuthService service; public AuthController(AuthService service){this.service=service;} @PostMapping("/login") public LoginResponse login(@Valid @RequestBody LoginRequest req){return service.login(req);} @PostMapping("/registro") public ResponseEntity<Void> registro(@Valid @RequestBody RegistroUsuarioRequest req){service.registrar(req);return ResponseEntity.status(HttpStatus.CREATED).build();} }

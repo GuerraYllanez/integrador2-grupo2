@@ -1,0 +1,271 @@
+.cita-form-page {
+  min-height: calc(100vh - 70px);
+  padding: 28px;
+  background: #f8fafc;
+  box-sizing: border-box;
+}
+
+.cita-form-header {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto 24px;
+}
+
+.cita-form-header h1 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.cita-form-header p {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.cita-form-card {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.06);
+}
+
+.cita-form-alert {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 22px;
+  padding: 13px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.cita-form-alert-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.cita-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 24px;
+}
+
+.cita-form-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cita-form-group-full {
+  grid-column: 1 / -1;
+}
+
+.cita-form-group label {
+  margin-bottom: 7px;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.cita-form-group input,
+.cita-form-group select,
+.cita-form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e293b;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.cita-form-group input,
+.cita-form-group select {
+  height: 44px;
+  padding: 0 13px;
+}
+
+.cita-form-group textarea {
+  min-height: 100px;
+  padding: 12px 13px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.cita-form-group input::placeholder,
+.cita-form-group textarea::placeholder {
+  color: #94a3b8;
+}
+
+.cita-form-group input:hover,
+.cita-form-group select:hover,
+.cita-form-group textarea:hover {
+  border-color: #94a3b8;
+}
+
+.cita-form-group input:focus,
+.cita-form-group select:focus,
+.cita-form-group textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.cita-form-group input:disabled,
+.cita-form-group select:disabled,
+.cita-form-group textarea:disabled {
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.cita-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.cita-form-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 130px;
+  height: 42px;
+  padding: 0 20px;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
+}
+
+.cita-form-btn:active {
+  transform: translateY(1px);
+}
+
+.cita-form-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cita-form-btn-secondary {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.cita-form-btn-secondary:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #1e293b;
+}
+
+.cita-form-btn-primary {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.cita-form-btn-primary:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+}
+
+.cita-form-loading {
+  margin: 0;
+  color: #64748b;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .cita-form-page {
+    padding: 18px;
+  }
+
+  .cita-form-card {
+    padding: 20px;
+  }
+
+  .cita-form-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .cita-form-group-full {
+    grid-column: auto;
+  }
+
+  .cita-form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .cita-form-btn {
+    width: 100%;
+  }
+}
+
+/* Móvil */
+@media (max-width: 480px) {
+  .cita-form-page {
+    padding: 14px;
+  }
+
+  .cita-form-card {
+    padding: 16px;
+    border-radius: 10px;
+  }
+
+  .cita-form-header {
+    margin-bottom: 18px;
+  }
+
+  .cita-form-header h1 {
+    font-size: 24px;
+  }
+
+  .cita-form-header p {
+    font-size: 14px;
+  }
+
+  .cita-form-group input,
+  .cita-form-group select {
+    height: 42px;
+  }
+
+  .cita-form-actions {
+    margin-top: 24px;
+    padding-top: 18px;
+  }
+}

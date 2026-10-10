@@ -1,0 +1,221 @@
+.odontologo-detail-page {
+  padding: 28px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: #1f2937;
+}
+
+.odontologo-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.odontologo-detail-breadcrumb {
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 7px;
+}
+
+.odontologo-detail-header h1 {
+  margin: 0;
+  color: #172033;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.odontologo-detail-header p {
+  margin: 7px 0 0;
+  color: #64748b;
+}
+
+.odontologo-detail-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.odontologo-detail-btn {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 17px;
+  min-height: 42px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.odontologo-detail-btn-primary {
+  color: #ffffff;
+  background: #2563eb;
+}
+
+.odontologo-detail-btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.odontologo-detail-btn-secondary {
+  color: #334155;
+  background: #ffffff;
+  border: 1px solid #dbe2ea;
+}
+
+.odontologo-detail-btn-secondary:hover {
+  background: #f8fafc;
+}
+
+.odontologo-profile-card,
+.odontologo-information-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.05);
+}
+
+.odontologo-profile-card {
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
+.odontologo-profile-top {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+}
+
+.odontologo-profile-avatar {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.odontologo-profile-top h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 21px;
+}
+
+.odontologo-profile-top p {
+  margin: 5px 0 10px;
+  color: #64748b;
+}
+
+.odontologo-detail-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.odontologo-detail-status span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.odontologo-detail-status.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.odontologo-detail-status.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.odontologo-information-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.odontologo-information-header h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 17px;
+}
+
+.odontologo-information-header p {
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.odontologo-information-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.odontologo-information-item {
+  padding: 20px 24px;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.odontologo-information-item:nth-child(odd) {
+  border-right: 1px solid #eef2f7;
+}
+
+.odontologo-information-item span {
+  display: block;
+  margin-bottom: 6px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.odontologo-information-item strong {
+  color: #172033;
+  font-size: 14px;
+}
+
+.odontologo-detail-loading {
+  padding: 80px 20px;
+  text-align: center;
+  color: #64748b;
+}
+
+.odontologo-detail-error {
+  background: #ffffff;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 30px;
+}
+
+.odontologo-detail-error h2 {
+  margin-top: 0;
+  color: #991b1b;
+}
+
+.odontologo-detail-error p {
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 800px) {
+  .odontologo-detail-page {
+    padding: 20px;
+  }
+
+  .odontologo-detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .odontologo-information-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .odontologo-information-item:nth-child(odd) {
+    border-right: 0;
+  }
+}

@@ -1,0 +1,384 @@
+.odontologos-page {
+  padding: 28px 32px;
+  max-width: 1500px;
+  margin: 0 auto;
+  color: #1f2937;
+}
+
+.odontologos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 26px;
+}
+
+.odontologos-breadcrumb {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 7px;
+}
+
+.odontologos-header h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  color: #172033;
+}
+
+.odontologos-header p {
+  margin: 7px 0 0;
+  color: #64748b;
+  font-size: 15px;
+}
+
+.odontologos-btn {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  min-height: 42px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
+}
+
+.odontologos-btn:hover {
+  transform: translateY(-1px);
+}
+
+.odontologos-btn-primary {
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.18);
+}
+
+.odontologos-btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.odontologos-btn-light {
+  background: #f8fafc;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+.odontologos-btn-light:hover {
+  background: #f1f5f9;
+}
+
+.odontologos-btn-icon {
+  font-size: 18px;
+  margin-right: 7px;
+  vertical-align: -1px;
+}
+
+.odontologos-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.odontologos-summary-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.odontologos-summary-label {
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.odontologos-summary-value {
+  color: #172033;
+  font-size: 27px;
+  font-weight: 700;
+}
+
+.odontologos-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.05);
+}
+
+.odontologos-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 22px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.odontologos-card-header h2 {
+  margin: 0;
+  font-size: 17px;
+  color: #172033;
+}
+
+.odontologos-card-header p {
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.odontologos-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.odontologos-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1050px;
+}
+
+.odontologos-table thead {
+  background: #f8fafc;
+}
+
+.odontologos-table th {
+  padding: 13px 18px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.odontologos-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid #eef2f7;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.odontologos-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.odontologos-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.odontologos-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.odontologos-profesional {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.odontologos-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.odontologos-profesional strong {
+  display: block;
+  color: #172033;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.odontologos-profesional span {
+  display: block;
+  margin-top: 3px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.odontologos-specialty {
+  color: #334155;
+  font-weight: 500;
+}
+
+.odontologos-license {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.odontologos-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.odontologos-contact span:first-child {
+  color: #334155;
+  font-weight: 500;
+}
+
+.odontologos-contact span:last-child {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.odontologos-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.odontologos-status-active {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.odontologos-status-inactive {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.odontologos-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.odontologos-actions-header {
+  text-align: center !important;
+}
+
+.odontologos-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.odontologos-action {
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.odontologos-action-view {
+  color: #475569;
+}
+
+.odontologos-action-view:hover {
+  background: #f1f5f9;
+}
+
+.odontologos-action-edit {
+  color: #2563eb;
+}
+
+.odontologos-action-edit:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.odontologos-action-delete {
+  color: #dc2626;
+}
+
+.odontologos-action-delete:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.odontologos-alert {
+  margin-bottom: 20px;
+  padding: 12px 15px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #991b1b;
+  font-size: 14px;
+}
+
+.odontologos-loading {
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.odontologos-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: odontologos-spin 0.8s linear infinite;
+}
+
+@keyframes odontologos-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.odontologos-empty {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.odontologos-empty h3 {
+  margin: 0 0 8px;
+  color: #172033;
+}
+
+.odontologos-empty p {
+  margin: 0 0 20px;
+  color: #64748b;
+}
+
+@media (max-width: 900px) {
+  .odontologos-page {
+    padding: 20px;
+  }
+
+  .odontologos-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .odontologos-summary {
+    grid-template-columns: 1fr;
+  }
+}

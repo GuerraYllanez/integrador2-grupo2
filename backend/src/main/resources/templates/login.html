@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ODAM - Iniciar sesión</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.10);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo h1 {
+            margin: 0;
+            color: #1769aa;
+        }
+
+        .logo p {
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #1769aa;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 7px;
+            background: #1769aa;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #12578e;
+        }
+
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .mensaje {
+            display: none;
+            margin-bottom: 18px;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .error {
+            display: block;
+            background: #ffe5e5;
+            color: #b00020;
+        }
+
+        .exito {
+            display: block;
+            background: #e4f7e9;
+            color: #176b2c;
+        }
+
+        .registro {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        .registro a {
+            color: #1769aa;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <div class="logo">
+        <h1>ODAM</h1>
+        <p>Sistema de Gestión Odontológica</p>
+    </div>
+
+    <div id="mensaje" class="mensaje"></div>
+
+    <form id="loginForm">
+
+        <div class="form-group">
+            <label for="correo">Correo electrónico</label>
+            <input
+                type="email"
+                id="correo"
+                name="correo"
+                placeholder="ejemplo@correo.com"
+                required>
+        </div>
+
+        <div class="form-group">
+            <label for="contrasena">Contraseña</label>
+            <input
+                type="password"
+                id="contrasena"
+                name="contrasena"
+                placeholder="Ingrese su contraseña"
+                minlength="6"
+                required>
+        </div>
+
+        <button type="submit" id="btnLogin">
+            Ingresar
+        </button>
+
+    </form>
+
+    <div class="registro">
+        ¿No tienes una cuenta?
+        <a href="/registro">Registrarse</a>
+    </div>
+
+</div>
+
+<script>
+    const form = document.getElementById("loginForm");
+    const mensaje = document.getElementById("mensaje");
+    const btnLogin = document.getElementById("btnLogin");
+
+    form.addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        const correo = document.getElementById("correo").value.trim();
+        const contrasena = document.getElementById("contrasena").value;
+
+        mensaje.className = "mensaje";
+        mensaje.textContent = "";
+
+        btnLogin.disabled = true;
+        btnLogin.textContent = "Ingresando...";
+
+        try {
+
+            const response = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    correo: correo,
+                    contrasena: contrasena
+                })
+            });
+
+            if (!response.ok) {
+
+                let texto = "Correo o contraseña incorrectos.";
+
+                try {
+                    const errorData = await response.json();
+
+                    if (errorData.message) {
+                        texto = errorData.message;
+                    }
+                } catch (e) {
+                    // Si la respuesta no contiene JSON, usamos el mensaje por defecto.
+                }
+
+                throw new Error(texto);
+            }
+
+            const data = await response.json();
+
+            // Guardamos la información necesaria de la sesión
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("tipo", data.tipo);
+            localStorage.setItem("correo", data.correo);
+            localStorage.setItem("rol", data.rol);
+            localStorage.setItem("nombreUsuario", data.nombreUsuario);
+
+            mensaje.className = "mensaje exito";
+            mensaje.textContent = "Inicio de sesión correcto. Ingresando...";
+
+            // Redirección al dashboard
+            setTimeout(() => {
+                window.location.href = "/dashboard";
+            }, 700);
+
+        } catch (error) {
+
+            mensaje.className = "mensaje error";
+            mensaje.textContent = error.message;
+
+            btnLogin.disabled = false;
+            btnLogin.textContent = "Ingresar";
+        }
+    });
+</script>
+
+</body>
+</html>
