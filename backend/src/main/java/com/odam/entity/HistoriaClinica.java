@@ -1,7 +1,8 @@
+
 package com.odam.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "historias_clinicas")
@@ -29,20 +30,20 @@ public class HistoriaClinica {
     // ============================================================
 
     @Column(
-        name = "codigo_historia",
+        name = "codigo",
         nullable = false,
         unique = true,
         length = 50
     )
     private String codigoHistoria;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "antecedentes", columnDefinition = "TEXT")
     private String antecedentes;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "alergias", columnDefinition = "TEXT")
     private String alergias;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "observaciones", columnDefinition = "TEXT")
     private String observaciones;
 
     // ============================================================
@@ -54,14 +55,7 @@ public class HistoriaClinica {
         insertable = false,
         updatable = false
     )
-    private LocalDateTime fechaCreacion;
-
-    @Column(
-        name = "fecha_actualizacion",
-        insertable = false,
-        updatable = false
-    )
-    private LocalDateTime fechaActualizacion;
+    private LocalDate fechaCreacion;
 
     // ============================================================
     // CONSTRUCTORES
@@ -122,19 +116,11 @@ public class HistoriaClinica {
         this.observaciones = observaciones;
     }
 
-    public LocalDateTime getFechaCreacion() {
+    public LocalDate getFechaCreacion() {
         return fechaCreacion;
     }
 
-    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+    public void setFechaCreacion(LocalDate fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
-    }
-
-    public LocalDateTime getFechaActualizacion() {
-        return fechaActualizacion;
-    }
-
-    public void setFechaActualizacion(LocalDateTime fechaActualizacion) {
-        this.fechaActualizacion = fechaActualizacion;
     }
 }
