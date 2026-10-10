@@ -38,13 +38,13 @@ public class Reprogramacion {
     private LocalTime horaAnterior;
 
     @Column(
-        name = "nueva_fecha",
+        name = "fecha_nueva",
         nullable = false
     )
     private LocalDate nuevaFecha;
 
     @Column(
-        name = "nueva_hora",
+        name = "hora_nueva",
         nullable = false
     )
     private LocalTime nuevaHora;
