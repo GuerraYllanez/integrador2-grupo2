@@ -49,13 +49,13 @@ public class Cita {
     private Horario horario;
 
     @Column(
-        name = "fecha_cita",
+        name = "fecha",
         nullable = false
     )
     private LocalDate fechaCita;
 
     @Column(
-        name = "hora_cita",
+        name = "hora",
         nullable = false
     )
     private LocalTime horaCita;
@@ -71,7 +71,7 @@ public class Cita {
     private String observaciones;
 
     @Column(
-        name = "fecha_registro",
+        name = "fecha_creacion",
         insertable = false,
         updatable = false
     )
