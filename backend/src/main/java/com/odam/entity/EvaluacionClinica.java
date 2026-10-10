@@ -27,7 +27,7 @@ public class EvaluacionClinica {
     private Odontologo odontologo;
 
     @Column(
-        name = "fecha_evaluacion",
+        name = "fecha",
         nullable = false
     )
     private LocalDate fechaEvaluacion;
