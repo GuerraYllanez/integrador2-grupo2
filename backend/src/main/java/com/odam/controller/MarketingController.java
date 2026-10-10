@@ -1,8 +1,9 @@
+
 package com.odam.controller;
 
 import com.odam.dto.MarketingRequest;
-import com.odam.entity.Marketing;
-import com.odam.repository.MarketingRepository;
+import com.odam.entity.CampanaMarketing;
+import com.odam.repository.CampanaMarketingRepository;
 
 import jakarta.validation.Valid;
 
@@ -17,170 +18,107 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173")
 public class MarketingController {
 
-    private final MarketingRepository marketingRepository;
+    private final CampanaMarketingRepository campanaRepository;
 
     public MarketingController(
-            MarketingRepository marketingRepository) {
-        this.marketingRepository = marketingRepository;
+            CampanaMarketingRepository campanaRepository) {
+        this.campanaRepository = campanaRepository;
     }
 
-    // ============================================================
-    // LISTAR
-    // ============================================================
-
+    // LISTAR CAMPAÑAS
     @GetMapping
     @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<List<Marketing>> listar() {
-        return ResponseEntity.ok(
-                marketingRepository.findAll()
-        );
+    public ResponseEntity<List<CampanaMarketing>> listar() {
+        return ResponseEntity.ok(campanaRepository.findAll());
     }
 
-    // ============================================================
-    // OBTENER POR ID
-    // ============================================================
-
+    // OBTENER CAMPAÑA POR ID
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<Marketing> obtener(
+    public ResponseEntity<CampanaMarketing> obtener(
             @PathVariable Integer id) {
 
-        return marketingRepository.findById(id)
+        return campanaRepository.findById(id)
                 .map(ResponseEntity::ok)
-                .orElse(
-                        ResponseEntity.notFound().build()
-                );
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // ============================================================
-    // CREAR
-    // ============================================================
-
+    // CREAR CAMPAÑA
     @PostMapping
     @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<Marketing> crear(
+    public ResponseEntity<CampanaMarketing> crear(
             @Valid @RequestBody MarketingRequest request) {
 
-        Marketing marketing = new Marketing();
+        CampanaMarketing campana = new CampanaMarketing();
 
-        marketing.setNombreCampana(
-                request.getNombreCampana().trim()
+        campana.setNombreCampana(request.getNombreCampana().trim());
+        campana.setDescripcion(request.getDescripcion());
+        campana.setFechaInicio(request.getFechaInicio());
+        campana.setFechaFin(request.getFechaFin());
+        campana.setEstado(
+                request.getEstado() == null ? true : request.getEstado()
         );
 
-        marketing.setDescripcion(
-                request.getDescripcion()
-        );
-
-        marketing.setFechaInicio(
-                request.getFechaInicio()
-        );
-
-        marketing.setFechaFin(
-                request.getFechaFin()
-        );
-
-        marketing.setEstado(
-                request.getEstado() == null
-                        ? true
-                        : request.getEstado()
-        );
-
-        Marketing guardado =
-                marketingRepository.save(marketing);
-
-        return ResponseEntity.ok(guardado);
+        return ResponseEntity.ok(campanaRepository.save(campana));
     }
 
-    // ============================================================
-    // ACTUALIZAR
-    // ============================================================
-
+    // ACTUALIZAR CAMPAÑA
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<?> actualizar(
+    public ResponseEntity<CampanaMarketing> actualizar(
             @PathVariable Integer id,
             @Valid @RequestBody MarketingRequest request) {
 
-        return marketingRepository.findById(id)
-                .map(marketing -> {
-
-                    marketing.setNombreCampana(
+        return campanaRepository.findById(id)
+                .map(campana -> {
+                    campana.setNombreCampana(
                             request.getNombreCampana().trim()
                     );
+                    campana.setDescripcion(request.getDescripcion());
+                    campana.setFechaInicio(request.getFechaInicio());
+                    campana.setFechaFin(request.getFechaFin());
 
-                    marketing.setDescripcion(
-                            request.getDescripcion()
+                    if (request.getEstado() != null) {
+                        campana.setEstado(request.getEstado());
+                    }
+
+                    return ResponseEntity.ok(
+                            campanaRepository.save(campana)
                     );
-
-                    marketing.setFechaInicio(
-                            request.getFechaInicio()
-                    );
-
-                    marketing.setFechaFin(
-                            request.getFechaFin()
-                    );
-
-                    marketing.setEstado(
-                            request.getEstado() == null
-                                    ? marketing.getEstado()
-                                    : request.getEstado()
-                    );
-
-                    Marketing actualizado =
-                            marketingRepository.save(marketing);
-
-                    return ResponseEntity.ok(actualizado);
                 })
-                .orElse(
-                        ResponseEntity.notFound().build()
-                );
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // ============================================================
-    // DESACTIVAR
-    // ============================================================
-
+    // DESACTIVAR CAMPAÑA
     @PutMapping("/{id}/desactivar")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<?> desactivar(
-            @PathVariable Integer id) {
+    public ResponseEntity<?> desactivar(@PathVariable Integer id) {
 
-        return marketingRepository.findById(id)
-                .map(marketing -> {
-
-                    marketing.setEstado(false);
-
-                    marketingRepository.save(marketing);
+        return campanaRepository.findById(id)
+                .map(campana -> {
+                    campana.setEstado(false);
+                    campanaRepository.save(campana);
 
                     return ResponseEntity.ok(
-                            "Registro de marketing desactivado correctamente."
+                            "Campaña desactivada correctamente."
                     );
                 })
-                .orElse(
-                        ResponseEntity.notFound().build()
-                );
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // ============================================================
-    // ELIMINAR DEFINITIVAMENTE
-    // ============================================================
-
+    // ELIMINAR CAMPAÑA
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<?> eliminar(
-            @PathVariable Integer id) {
+    public ResponseEntity<?> eliminar(@PathVariable Integer id) {
 
-        return marketingRepository.findById(id)
-                .map(marketing -> {
-
-                    marketingRepository.delete(marketing);
+        return campanaRepository.findById(id)
+                .map(campana -> {
+                    campanaRepository.delete(campana);
 
                     return ResponseEntity.ok(
-                            "Registro de marketing eliminado correctamente."
+                            "Campaña eliminada correctamente."
                     );
                 })
-                .orElse(
-                        ResponseEntity.notFound().build()
-                );
+                .orElse(ResponseEntity.notFound().build());
     }
 }

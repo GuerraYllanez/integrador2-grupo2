@@ -1,3 +1,4 @@
+
 -- ============================================================
 -- ODAM - SISTEMA DE GESTION ODONTOLOGICA
 -- ============================================================
@@ -69,6 +70,7 @@ CREATE TABLE IF NOT EXISTS personal_administrativo (
         ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- PERSONAL DEL AREA DE MARKETING
 CREATE TABLE IF NOT EXISTS marketing (
     id_marketing INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT UNIQUE NULL,
@@ -79,6 +81,20 @@ CREATE TABLE IF NOT EXISTS marketing (
     CONSTRAINT fk_marketing_usuario
         FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
         ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- CAMPAÑAS DE MARKETING
+-- Tabla independiente para las campañas publicitarias
+-- ============================================================
+CREATE TABLE IF NOT EXISTS campanas_marketing (
+    id_campana INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_campana VARCHAR(150) NOT NULL,
+    descripcion TEXT,
+    fecha_inicio DATE,
+    fecha_fin DATE,
+    estado BOOLEAN DEFAULT TRUE,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS servicios (
@@ -235,7 +251,9 @@ CREATE TABLE IF NOT EXISTS auditoria (
         ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ============================================================
 -- DATOS INICIALES
+-- ============================================================
 INSERT IGNORE INTO roles (nombre_rol, descripcion) VALUES
 ('ADMINISTRADOR', 'Control total del sistema'),
 ('PACIENTE', 'Acceso del paciente'),
@@ -251,7 +269,9 @@ INSERT IGNORE INTO servicios (nombre, descripcion, precio) VALUES
 ('Blanqueamiento dental', 'Blanqueamiento', 250.00),
 ('Ortodoncia', 'Tratamiento de ortodoncia', 300.00);
 
+-- ============================================================
 -- INDICES
+-- ============================================================
 CREATE INDEX idx_usuarios_rol_estado ON usuarios (id_rol, estado);
 CREATE INDEX idx_pacientes_nombres ON pacientes (apellidos, nombres);
 CREATE INDEX idx_citas_fecha_estado ON citas (fecha, estado);

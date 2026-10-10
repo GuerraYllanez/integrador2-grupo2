@@ -1,3 +1,4 @@
+
 package com.odam.entity;
 
 import jakarta.persistence.*;
@@ -17,32 +18,39 @@ public class Marketing {
     @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 
-    @Column(
-        name = "nombre_campana",
-        nullable = false,
-        length = 150
-    )
+    // Campos de campaña conservados para no eliminar
+    // los métodos que podrían utilizar otras clases.
+    @Transient
     private String nombreCampana;
 
-    @Column(columnDefinition = "TEXT")
+    @Transient
     private String descripcion;
 
-    @Column(name = "fecha_inicio")
+    @Transient
     private LocalDate fechaInicio;
 
-    @Column(name = "fecha_fin")
+    @Transient
     private LocalDate fechaFin;
 
-    @Column(nullable = false)
+    @Column(name = "estado")
     private Boolean estado = true;
 
-    @Column(
-        name = "fecha_creacion",
-        insertable = false,
-        updatable = false
-    )
+    // La tabla actual no tiene fecha_creacion.
+    @Transient
     private LocalDateTime fechaCreacion;
 
+    // Campos que sí existen en la tabla actual.
+    @Column(name = "nombres", nullable = false, length = 100)
+    private String nombres;
+
+    @Column(name = "apellidos", nullable = false, length = 100)
+    private String apellidos;
+
+    @Column(name = "canal", length = 100)
+    private String canal;
+
+    public Marketing() {
+    }
 
     public Integer getIdMarketing() {
         return idMarketing;
@@ -98,5 +106,29 @@ public class Marketing {
 
     public LocalDateTime getFechaCreacion() {
         return fechaCreacion;
+    }
+
+    public String getNombres() {
+        return nombres;
+    }
+
+    public void setNombres(String nombres) {
+        this.nombres = nombres;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+
+    public String getCanal() {
+        return canal;
+    }
+
+    public void setCanal(String canal) {
+        this.canal = canal;
     }
 }
