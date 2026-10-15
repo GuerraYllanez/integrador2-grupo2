@@ -29,6 +29,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.users = users;
     }
 
+    // No aplicar el filtro JWT a las solicitudes previas de CORS.
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return "OPTIONS".equalsIgnoreCase(request.getMethod());
+    }
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest req,
@@ -38,28 +44,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authorizationHeader = req.getHeader("Authorization");
 
-        // Verificar que exista el encabezado Bearer
+        // Verificar que exista el encabezado Bearer.
         if (authorizationHeader != null
                 && authorizationHeader.startsWith("Bearer ")) {
 
             try {
-
-                // Extraer el JWT
+                // Extraer el JWT.
                 String token = authorizationHeader.substring(7);
 
-                // Obtener el correo desde el JWT
+                // Obtener el correo desde el JWT.
                 String correo = jwt.correo(token);
 
-                // Verificar que todavía no exista una autenticación
+                // Verificar que todavía no exista una autenticación.
                 if (SecurityContextHolder
                         .getContext()
                         .getAuthentication() == null) {
 
-                    // Buscar el usuario en la base de datos
+                    // Buscar el usuario en la base de datos.
                     UserDetails userDetails =
                             users.loadUserByUsername(correo);
 
-                    // Verificar que el usuario esté habilitado
+                    // Verificar que el usuario esté habilitado.
                     if (userDetails.isEnabled()) {
 
                         UsernamePasswordAuthenticationToken authentication =
@@ -74,7 +79,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                         .buildDetails(req)
                         );
 
-                        // Registrar la autenticación en Spring Security
+                        // Registrar la autenticación en Spring Security.
                         SecurityContextHolder
                                 .getContext()
                                 .setAuthentication(authentication);
@@ -82,15 +87,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
 
             } catch (Exception e) {
-
-                // Si el JWT es inválido, expiró o no puede validarse,
-                // simplemente continúa sin autenticar al usuario.
-                SecurityContextHolder
-                        .clearContext();
+                // Si el JWT es inválido o expiró, limpiar la autenticación.
+                SecurityContextHolder.clearContext();
             }
         }
 
-        // Continuar con la petición
+        // Continuar con la petición.
         chain.doFilter(req, res);
     }
 }
