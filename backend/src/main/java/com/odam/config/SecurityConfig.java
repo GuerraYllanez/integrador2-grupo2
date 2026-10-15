@@ -5,6 +5,7 @@ import com.odam.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,94 +27,93 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-        private final JwtAuthenticationFilter jwt;
+    private final JwtAuthenticationFilter jwt;
 
-        @Value("${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,https://integrador2-grupo2-production.up.railway.app,https://integrador2-grupo2-psz2x7mm8-integrador2-grupo2.vercel.app}")
+    @Value("${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,https://integrador2-grupo2-production.up.railway.app,https://integrador2-grupo2-psz2x7mm8-integrador2-grupo2.vercel.app}")
+    private List<String> allowedOrigins;
 
-        private List<String> allowedOrigins;
+    public SecurityConfig(JwtAuthenticationFilter jwt) {
+        this.jwt = jwt;
+    }
 
-        public SecurityConfig(JwtAuthenticationFilter jwt) {
-                this.jwt = jwt;
-        }
+    // BCrypt para almacenar y verificar contraseñas.
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-        // BCrypt para almacenar y verificar contraseñas
-        @Bean
-        public PasswordEncoder passwordEncoder() {
-                return new BCryptPasswordEncoder();
-        }
+    // Configuración principal de Spring Security.
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http)
+            throws Exception {
 
-        // Configuración principal de Spring Security
-        @Bean
-        public SecurityFilterChain filterChain(HttpSecurity http)
-                        throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
 
-                http
-                                // JWT no necesita protección CSRF
-                                .csrf(csrf -> csrf.disable())
+            // Configuración CORS para el frontend.
+            .cors(cors ->
+                cors.configurationSource(corsConfigurationSource())
+            )
 
-                                // Configuración CORS para el frontend
-                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            // La aplicación utiliza JWT, no sesiones.
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(
+                    SessionCreationPolicy.STATELESS
+                )
+            )
 
-                                // La aplicación utiliza JWT, no sesiones
-                                .sessionManagement(session -> session.sessionCreationPolicy(
-                                                SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
 
-                                // Reglas de autorización
-                                .authorizeHttpRequests(auth -> auth
+                // Permitir las solicitudes previas de CORS.
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                                                // Login, registro y health son públicos
-                                                .requestMatchers(
-                                                                "/api/auth/**",
-                                                                "/api/health")
-                                                .permitAll()
+                // Login, registro y health son públicos.
+                .requestMatchers(
+                    "/api/auth/**",
+                    "/api/health"
+                ).permitAll()
 
-                                                // Solo ADMINISTRADOR
-                                                .requestMatchers("/api/admin/**")
-                                                .hasRole("ADMINISTRADOR")
+                // Solo ADMINISTRADOR.
+                .requestMatchers("/api/admin/**")
+                    .hasRole("ADMINISTRADOR")
 
-                                                // El resto de /api requiere autenticación
-                                                .requestMatchers("/api/**")
-                                                .authenticated()
+                // El resto de /api requiere autenticación.
+                .requestMatchers("/api/**").authenticated()
 
-                                                // Páginas del frontend
-                                                .anyRequest()
-                                                .permitAll())
+                // Páginas del frontend.
+                .anyRequest().permitAll()
+            )
 
-                                // Filtro JWT antes del filtro de autenticación estándar
-                                .addFilterBefore(
-                                                jwt,
-                                                UsernamePasswordAuthenticationFilter.class);
+            // Filtro JWT antes del filtro estándar.
+            .addFilterBefore(
+                jwt,
+                UsernamePasswordAuthenticationFilter.class
+            );
 
-                return http.build();
-        }
+        return http.build();
+    }
 
-        // Configuración CORS
-        @Bean
-        public CorsConfigurationSource corsConfigurationSource() {
+    // Configuración CORS.
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
 
-                CorsConfiguration config = new CorsConfiguration();
+        CorsConfiguration config = new CorsConfiguration();
 
-                config.setAllowedOrigins(allowedOrigins);
+        config.setAllowedOrigins(allowedOrigins);
 
-                config.setAllowedMethods(
-                                List.of(
-                                                "GET",
-                                                "POST",
-                                                "PUT",
-                                                "DELETE",
-                                                "OPTIONS"));
+        config.setAllowedMethods(
+            List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        );
 
-                config.setAllowedHeaders(
-                                List.of("*"));
+        config.setAllowedHeaders(List.of("*"));
 
-                config.setAllowCredentials(false);
+        config.setAllowCredentials(false);
 
-                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
 
-                source.registerCorsConfiguration(
-                                "/**",
-                                config);
+        source.registerCorsConfiguration("/**", config);
 
-                return source;
-        }
+        return source;
+    }
 }
