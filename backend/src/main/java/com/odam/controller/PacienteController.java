@@ -3,7 +3,6 @@ package com.odam.controller;
 import com.odam.dto.PacienteRequest;
 import com.odam.entity.Auditoria;
 import com.odam.entity.Paciente;
-import com.odam.entity.Usuario;
 import com.odam.repository.AuditoriaRepository;
 import com.odam.repository.PacienteRepository;
 import com.odam.repository.UsuarioRepository;
@@ -51,9 +50,7 @@ public class PacienteController {
     // ============================================================
 
     @GetMapping("/{id}")
-    public ResponseEntity<Paciente> obtener(
-            @PathVariable Integer id) {
-
+    public ResponseEntity<Paciente> obtener(@PathVariable Integer id) {
         return repo.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -72,7 +69,6 @@ public class PacienteController {
         }
 
         Paciente p = new Paciente();
-
         p.setNombres(r.nombres());
         p.setApellidos(r.apellidos());
         p.setDocumento(r.documento());
@@ -97,7 +93,7 @@ public class PacienteController {
     }
 
     // ============================================================
-    // EDITAR PACIENTE
+    // ACTUALIZAR PACIENTE
     // ============================================================
 
     @PutMapping("/{id}")
@@ -140,25 +136,27 @@ public class PacienteController {
     }
 
     // ============================================================
-    // DESACTIVAR PACIENTE (ELIMINACIÓN LÓGICA)
+    // DESACTIVAR PACIENTE
     // ============================================================
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> desactivar(
-            @PathVariable Integer id) {
-
+    public ResponseEntity<Void> desactivar(@PathVariable Integer id) {
         return repo.findById(id)
                 .map(paciente -> {
 
+                    if (Boolean.FALSE.equals(paciente.getEstado())) {
+                        return ResponseEntity.noContent().<Void>build();
+                    }
+
                     paciente.setEstado(false);
-                    repo.save(paciente);
+                    Paciente actualizado = repo.save(paciente);
 
                     registrarAuditoria(
                             "DESACTIVAR_PACIENTE",
-                            paciente.getIdPaciente(),
+                            actualizado.getIdPaciente(),
                             "Se desactivó el paciente: "
-                                    + paciente.getNombres() + " "
-                                    + paciente.getApellidos()
+                                    + actualizado.getNombres() + " "
+                                    + actualizado.getApellidos()
                     );
 
                     return ResponseEntity.noContent().<Void>build();
@@ -171,11 +169,13 @@ public class PacienteController {
     // ============================================================
 
     @PutMapping("/{id}/activar")
-    public ResponseEntity<Paciente> activar(
-            @PathVariable Integer id) {
-
+    public ResponseEntity<Paciente> activar(@PathVariable Integer id) {
         return repo.findById(id)
                 .map(paciente -> {
+
+                    if (Boolean.TRUE.equals(paciente.getEstado())) {
+                        return ResponseEntity.ok(paciente);
+                    }
 
                     paciente.setEstado(true);
                     Paciente actualizado = repo.save(paciente);
@@ -194,29 +194,28 @@ public class PacienteController {
     }
 
     // ============================================================
-    // ELIMINAR PACIENTE DEFINITIVAMENTE
+    // ELIMINAR PACIENTE: BAJA LÓGICA SEGURA
+    // Mantiene las historias clínicas y demás relaciones.
     // ============================================================
 
     @DeleteMapping("/{id}/eliminar")
-    public ResponseEntity<Void> eliminar(
-            @PathVariable Integer id) {
-
+    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         return repo.findById(id)
                 .map(paciente -> {
 
-                    Integer idPaciente = paciente.getIdPaciente();
-                    String nombrePaciente =
-                            paciente.getNombres() + " "
-                                    + paciente.getApellidos();
+                    if (Boolean.FALSE.equals(paciente.getEstado())) {
+                        return ResponseEntity.noContent().<Void>build();
+                    }
 
-                    repo.delete(paciente);
-                    repo.flush();
+                    paciente.setEstado(false);
+                    Paciente actualizado = repo.save(paciente);
 
                     registrarAuditoria(
-                            "ELIMINAR_PACIENTE",
-                            idPaciente,
-                            "Se eliminó definitivamente el paciente: "
-                                    + nombrePaciente
+                            "DESACTIVAR_PACIENTE",
+                            actualizado.getIdPaciente(),
+                            "Se dio de baja lógica al paciente: "
+                                    + actualizado.getNombres() + " "
+                                    + actualizado.getApellidos()
                     );
 
                     return ResponseEntity.noContent().<Void>build();
