@@ -52,6 +52,10 @@ export async function apiFetch<T>(
             JSON.parse(body);
 
           if (
+            typeof data.mensaje === "string"
+          ) {
+            mensaje = data.mensaje;
+          } else if (
             typeof data.message === "string"
           ) {
             mensaje = data.message;

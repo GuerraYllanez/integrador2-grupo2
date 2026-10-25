@@ -3,14 +3,15 @@ package com.odam.exception;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.LinkedHashMap;
@@ -123,6 +124,18 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 "RESOURCE_NOT_FOUND",
                 "No se encontró el recurso solicitado",
+                null
+        );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> dataIntegrityViolation() {
+        return respuesta(
+                HttpStatus.CONFLICT,
+                "DATA_INTEGRITY_CONFLICT",
+                "No se puede completar la operación porque el registro "
+                        + "está relacionado con otros datos del sistema. "
+                        + "Verifique las dependencias antes de continuar.",
                 null
         );
     }

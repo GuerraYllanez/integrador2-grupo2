@@ -26,6 +26,7 @@ export default function Pacientes() {
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
+  const [mensaje, setMensaje] = useState("");
   const [procesandoId, setProcesandoId] = useState<number | null>(null);
   const [filtroEstado, setFiltroEstado] =
     useState<FiltroEstado>("ACTIVOS");
@@ -69,6 +70,7 @@ export default function Pacientes() {
     try {
       setProcesandoId(paciente.idPaciente);
       setError("");
+      setMensaje("");
 
       await apiFetch(
         activar
@@ -86,11 +88,60 @@ export default function Pacientes() {
             : item
         )
       );
+
+      setMensaje(
+        `Paciente ${nombreCompleto} ${activar ? "activado" : "desactivado"
+        } correctamente.`
+      );
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
           : `No se pudo ${accion} al paciente.`
+      );
+    } finally {
+      setProcesandoId(null);
+    }
+  }
+
+  async function eliminarPacienteFisicamente(paciente: Paciente) {
+    const nombreCompleto =
+      `${paciente.nombres} ${paciente.apellidos}`;
+
+    const confirmar = window.confirm(
+      `¿Desea eliminar PERMANENTEMENTE al paciente ${nombreCompleto} (ID: ${paciente.idPaciente})?\n\n` +
+      "Esta acción es irreversible. El sistema solo permitirá eliminarlo si no tiene registros relacionados.\n\n" +
+      "Presione Aceptar para continuar."
+    );
+
+    if (!confirmar) return;
+
+    try {
+      setProcesandoId(paciente.idPaciente);
+      setError("");
+      setMensaje("");
+
+      await apiFetch(
+        `/api/pacientes/${paciente.idPaciente}/eliminar`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      setPacientes((actuales) =>
+        actuales.filter(
+          (item) => item.idPaciente !== paciente.idPaciente
+        )
+      );
+
+      setMensaje(
+        `El paciente ${nombreCompleto} fue eliminado correctamente.`
+      );
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "No se pudo eliminar al paciente. Puede tener citas, historias clínicas u otros registros relacionados."
       );
     } finally {
       setProcesandoId(null);
@@ -140,7 +191,24 @@ export default function Pacientes() {
         </button>
       </div>
 
-      {/* MENSAJES DE ERROR */}
+      {/* MENSAJE DE ÉXITO */}
+      {mensaje && (
+        <div className="rounded-xl border border-green-200 bg-green-50 px-5 py-4">
+          <p className="text-sm font-medium text-green-700">
+            {mensaje}
+          </p>
+
+          <button
+            type="button"
+            onClick={() => setMensaje("")}
+            className="mt-2 text-sm font-semibold text-green-700 underline"
+          >
+            Cerrar mensaje
+          </button>
+        </div>
+      )}
+
+      {/* MENSAJE DE ERROR */}
       {error && (
         <div className="rounded-xl border border-red-200 bg-red-50 px-5 py-4">
           <p className="text-sm font-medium text-red-700">
@@ -191,7 +259,8 @@ export default function Pacientes() {
               </h2>
 
               <p className="text-sm text-gray-500">
-                Los historiales clínicos se conservan al desactivar un paciente.
+                Desactivar conserva el historial clínico. La eliminación física
+                solo se permite cuando no existen registros relacionados.
               </p>
             </div>
 
@@ -273,7 +342,7 @@ export default function Pacientes() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[1250px] text-left">
+            <table className="w-full min-w-[1450px] text-left">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50">
                   <th className="whitespace-nowrap px-5 py-4 text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -405,6 +474,17 @@ export default function Pacientes() {
                               {procesando ? "Procesando..." : "Activar"}
                             </button>
                           )}
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              void eliminarPacienteFisicamente(paciente)
+                            }
+                            disabled={procesando}
+                            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {procesando ? "Procesando..." : "Eliminar"}
+                          </button>
                         </div>
                       </td>
                     </tr>

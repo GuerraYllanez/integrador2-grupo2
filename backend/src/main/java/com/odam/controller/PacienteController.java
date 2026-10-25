@@ -4,19 +4,25 @@ import com.odam.dto.PacienteRequest;
 import com.odam.entity.Auditoria;
 import com.odam.entity.Paciente;
 import com.odam.repository.AuditoriaRepository;
+import com.odam.repository.CitaRepository;
+import com.odam.repository.HistoriaClinicaRepository;
+import com.odam.repository.PacienteExtranjeroRepository;
 import com.odam.repository.PacienteRepository;
+import com.odam.repository.PagoRepository;
+import com.odam.repository.UrgenciaDentalRepository;
 import com.odam.repository.UsuarioRepository;
 
 import jakarta.validation.Valid;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/pacientes")
@@ -26,28 +32,36 @@ public class PacienteController {
     private final PacienteRepository repo;
     private final AuditoriaRepository auditoriaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final CitaRepository citaRepository;
+    private final HistoriaClinicaRepository historiaRepository;
+    private final PacienteExtranjeroRepository extranjeroRepository;
+    private final PagoRepository pagoRepository;
+    private final UrgenciaDentalRepository urgenciaRepository;
 
     public PacienteController(
             PacienteRepository repo,
             AuditoriaRepository auditoriaRepository,
-            UsuarioRepository usuarioRepository) {
+            UsuarioRepository usuarioRepository,
+            CitaRepository citaRepository,
+            HistoriaClinicaRepository historiaRepository,
+            PacienteExtranjeroRepository extranjeroRepository,
+            PagoRepository pagoRepository,
+            UrgenciaDentalRepository urgenciaRepository) {
+
         this.repo = repo;
         this.auditoriaRepository = auditoriaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.citaRepository = citaRepository;
+        this.historiaRepository = historiaRepository;
+        this.extranjeroRepository = extranjeroRepository;
+        this.pagoRepository = pagoRepository;
+        this.urgenciaRepository = urgenciaRepository;
     }
-
-    // ============================================================
-    // LISTAR PACIENTES
-    // ============================================================
 
     @GetMapping
     public List<Paciente> listar() {
         return repo.findAll();
     }
-
-    // ============================================================
-    // OBTENER PACIENTE POR ID
-    // ============================================================
 
     @GetMapping("/{id}")
     public ResponseEntity<Paciente> obtener(@PathVariable Integer id) {
@@ -56,16 +70,13 @@ public class PacienteController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // ============================================================
-    // CREAR PACIENTE
-    // ============================================================
-
     @PostMapping
-    public ResponseEntity<Paciente> crear(
-            @Valid @RequestBody PacienteRequest r) {
+    public ResponseEntity<?> crear(@Valid @RequestBody PacienteRequest r) {
 
         if (repo.existsByDocumento(r.documento())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("mensaje",
+                            "Ya existe un paciente con ese documento."));
         }
 
         Paciente p = new Paciente();
@@ -86,29 +97,24 @@ public class PacienteController {
                 guardado.getIdPaciente(),
                 "Se creó el paciente: "
                         + guardado.getNombres() + " "
-                        + guardado.getApellidos()
-        );
+                        + guardado.getApellidos());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
     }
 
-    // ============================================================
-    // ACTUALIZAR PACIENTE
-    // ============================================================
-
     @PutMapping("/{id}")
-    public ResponseEntity<Paciente> actualizar(
+    public ResponseEntity<?> actualizar(
             @PathVariable Integer id,
             @Valid @RequestBody PacienteRequest r) {
 
         return repo.findById(id)
-                .map(paciente -> {
+                .<ResponseEntity<?>>map(paciente -> {
 
                     if (!paciente.getDocumento().equals(r.documento())
                             && repo.existsByDocumento(r.documento())) {
-                        return ResponseEntity
-                                .status(HttpStatus.CONFLICT)
-                                .<Paciente>build();
+                        return ResponseEntity.status(HttpStatus.CONFLICT)
+                                .body(Map.of("mensaje",
+                                        "El documento ya está registrado."));
                     }
 
                     paciente.setNombres(r.nombres());
@@ -127,51 +133,45 @@ public class PacienteController {
                             actualizado.getIdPaciente(),
                             "Se actualizaron los datos del paciente: "
                                     + actualizado.getNombres() + " "
-                                    + actualizado.getApellidos()
-                    );
+                                    + actualizado.getApellidos());
 
                     return ResponseEntity.ok(actualizado);
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // ============================================================
-    // DESACTIVAR PACIENTE
-    // ============================================================
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> desactivar(@PathVariable Integer id) {
+    @Transactional
+    public ResponseEntity<?> desactivar(@PathVariable Integer id) {
+
         return repo.findById(id)
-                .map(paciente -> {
+                .<ResponseEntity<?>>map(paciente -> {
 
                     if (Boolean.FALSE.equals(paciente.getEstado())) {
-                        return ResponseEntity.noContent().<Void>build();
+                        return ResponseEntity.noContent().build();
                     }
 
                     paciente.setEstado(false);
-                    Paciente actualizado = repo.save(paciente);
+                    repo.save(paciente);
 
                     registrarAuditoria(
                             "DESACTIVAR_PACIENTE",
-                            actualizado.getIdPaciente(),
-                            "Se desactivó el paciente: "
-                                    + actualizado.getNombres() + " "
-                                    + actualizado.getApellidos()
-                    );
+                            id,
+                            "Se desactivó al paciente: "
+                                    + paciente.getNombres() + " "
+                                    + paciente.getApellidos());
 
-                    return ResponseEntity.noContent().<Void>build();
+                    return ResponseEntity.noContent().build();
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // ============================================================
-    // ACTIVAR PACIENTE
-    // ============================================================
-
     @PutMapping("/{id}/activar")
-    public ResponseEntity<Paciente> activar(@PathVariable Integer id) {
+    @Transactional
+    public ResponseEntity<?> activar(@PathVariable Integer id) {
+
         return repo.findById(id)
-                .map(paciente -> {
+                .<ResponseEntity<?>>map(paciente -> {
 
                     if (Boolean.TRUE.equals(paciente.getEstado())) {
                         return ResponseEntity.ok(paciente);
@@ -182,50 +182,75 @@ public class PacienteController {
 
                     registrarAuditoria(
                             "ACTIVAR_PACIENTE",
-                            actualizado.getIdPaciente(),
-                            "Se activó el paciente: "
-                                    + actualizado.getNombres() + " "
-                                    + actualizado.getApellidos()
-                    );
+                            id,
+                            "Se activó al paciente: "
+                                    + paciente.getNombres() + " "
+                                    + paciente.getApellidos());
 
                     return ResponseEntity.ok(actualizado);
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // ============================================================
-    // ELIMINAR PACIENTE: BAJA LÓGICA SEGURA
-    // Mantiene las historias clínicas y demás relaciones.
-    // ============================================================
-
     @DeleteMapping("/{id}/eliminar")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
-        return repo.findById(id)
-                .map(paciente -> {
+    @Transactional
+    public ResponseEntity<?> eliminar(@PathVariable Integer id) {
 
-                    if (Boolean.FALSE.equals(paciente.getEstado())) {
-                        return ResponseEntity.noContent().<Void>build();
-                    }
+        Paciente paciente = repo.findById(id).orElse(null);
 
-                    paciente.setEstado(false);
-                    Paciente actualizado = repo.save(paciente);
+        if (paciente == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("mensaje", "El paciente no existe."));
+        }
 
-                    registrarAuditoria(
-                            "DESACTIVAR_PACIENTE",
-                            actualizado.getIdPaciente(),
-                            "Se dio de baja lógica al paciente: "
-                                    + actualizado.getNombres() + " "
-                                    + actualizado.getApellidos()
-                    );
+        // Comprobar todas las relaciones directas relevantes.
+        if (historiaRepository.existsByPacienteIdPaciente(id)) {
+            return conflicto(
+                    "No se puede eliminar: el paciente tiene historia clínica.");
+        }
 
-                    return ResponseEntity.noContent().<Void>build();
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        if (citaRepository.existsByPaciente_IdPaciente(id)) {
+            return conflicto(
+                    "No se puede eliminar: el paciente tiene citas registradas.");
+        }
+
+        if (extranjeroRepository.existsByPaciente_IdPaciente(id)) {
+            return conflicto(
+                    "No se puede eliminar: existe un registro de paciente extranjero.");
+        }
+
+        if (pagoRepository.existsByPaciente_IdPaciente(id)) {
+            return conflicto(
+                    "No se puede eliminar: el paciente tiene pagos registrados.");
+        }
+
+        if (urgenciaRepository.existsByPaciente_IdPaciente(id)) {
+            return conflicto(
+                    "No se puede eliminar: el paciente tiene urgencias registradas.");
+        }
+
+        // Registrar la acción antes de eliminar al paciente.
+        registrarAuditoria(
+                "ELIMINAR_PACIENTE",
+                id,
+                "Eliminación física del paciente: "
+                        + paciente.getNombres() + " "
+                        + paciente.getApellidos()
+                        + ". El usuario asociado no fue eliminado.");
+
+        repo.delete(paciente);
+        repo.flush();
+
+        return ResponseEntity.ok(
+                Map.of("mensaje",
+                        "Paciente eliminado correctamente. "
+                                + "El usuario asociado, si existe, se conservó."));
     }
 
-    // ============================================================
-    // REGISTRAR EVENTO DE AUDITORÍA
-    // ============================================================
+    private ResponseEntity<Map<String, String>> conflicto(String mensaje) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("mensaje", mensaje));
+    }
 
     private void registrarAuditoria(
             String accion,
@@ -234,8 +259,7 @@ public class PacienteController {
 
         Auditoria registro = new Auditoria();
 
-        Authentication autenticacion =
-                SecurityContextHolder.getContext().getAuthentication();
+        Authentication autenticacion = SecurityContextHolder.getContext().getAuthentication();
 
         if (autenticacion != null
                 && autenticacion.isAuthenticated()
