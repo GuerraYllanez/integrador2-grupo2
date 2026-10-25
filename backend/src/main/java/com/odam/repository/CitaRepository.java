@@ -28,4 +28,6 @@ public interface CitaRepository
             @Param("horaCita") LocalTime horaCita,
             @Param("idCita") Integer idCita
     );
+
+    boolean existsByPaciente_IdPaciente(Integer idPaciente);
 }
