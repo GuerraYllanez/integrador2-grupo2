@@ -49,4 +49,8 @@ public interface UrgenciaDentalRepository
     })
     @Override
     Optional<UrgenciaDental> findById(Integer id);
+
+    // Comprueba si el paciente tiene urgencias (incluidas las eliminadas logicamente),
+    // necesario para validar la eliminacion fisica del paciente.
+    boolean existsByPaciente_IdPaciente(Integer idPaciente);
 }
