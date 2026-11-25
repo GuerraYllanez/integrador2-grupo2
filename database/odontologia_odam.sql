@@ -1,4 +1,3 @@
-
 -- ============================================================
 -- ODAM - SISTEMA DE GESTION ODONTOLOGICA
 -- ============================================================
@@ -278,3 +277,51 @@ CREATE INDEX idx_citas_fecha_estado ON citas (fecha, estado);
 CREATE INDEX idx_horarios_fecha_estado ON horarios (fecha, estado);
 CREATE INDEX idx_pagos_fecha_estado ON pagos (fecha_pago, estado);
 CREATE INDEX idx_auditoria_fecha ON auditoria (fecha);
+
+CREATE DATABASE IF NOT EXISTS odontologia_odam
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE odontologia_odam;
+
+CREATE TABLE IF NOT EXISTS estado_ticket (
+  id_estado INT AUTO_INCREMENT PRIMARY KEY,
+  nombre_estado VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS prioridad (
+  id_prioridad INT AUTO_INCREMENT PRIMARY KEY,
+  nombre_prioridad VARCHAR(50) NOT NULL UNIQUE,
+  tiempo_sla_minutos INT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS asignado_a (
+  id_asignado_a INT AUTO_INCREMENT PRIMARY KEY,
+  nombre_responsable VARCHAR(100) NOT NULL,
+  nivel_soporte VARCHAR(80) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ticket (
+  id_ticket INT AUTO_INCREMENT PRIMARY KEY,
+  codigo VARCHAR(20) NOT NULL UNIQUE,
+  titulo VARCHAR(150) NOT NULL,
+  modulo_afectado VARCHAR(100) NOT NULL,
+  descripcion TEXT NOT NULL,
+  fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  id_estado INT NOT NULL,
+  id_prioridad INT NOT NULL,
+  id_usuario_reporta INT NULL,
+  id_asignado_a INT NULL,
+  CONSTRAINT fk_ticket_estado FOREIGN KEY (id_estado) REFERENCES estado_ticket(id_estado),
+  CONSTRAINT fk_ticket_prioridad FOREIGN KEY (id_prioridad) REFERENCES prioridad(id_prioridad),
+  CONSTRAINT fk_ticket_asignado FOREIGN KEY (id_asignado_a) REFERENCES asignado_a(id_asignado_a)
+);
+
+INSERT IGNORE INTO estado_ticket (id_estado, nombre_estado) VALUES
+  (1, 'Abierto'), (2, 'En Progreso'), (3, 'Resuelto'), (4, 'Cerrado');
+
+INSERT IGNORE INTO prioridad (id_prioridad, nombre_prioridad, tiempo_sla_minutos) VALUES
+  (1, 'P1 - Crítico', 15), (2, 'P2 - Alto', 60), (3, 'P3 - Normal', 240), (4, 'P4 - Bajo', 1440);
+
+INSERT IGNORE INTO asignado_a (id_asignado_a, nombre_responsable, nivel_soporte) VALUES
+  (1, 'Mesa de Ayuda ODAM', 'Nivel 1 - Help Desk'),
+  (2, 'Equipo de Desarrollo ODAM', 'Nivel 2 - Desarrollo'),
+  (3, 'Administración BD / Infraestructura', 'Nivel 3 - Infraestructura');
