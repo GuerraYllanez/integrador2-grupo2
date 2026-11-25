@@ -98,6 +98,7 @@ import MarketingDetalle from "../pages/marketing/MarketingDetalle";
 
 import CasosEspeciales from "../pages/casos-especiales/CasosEspeciales";
 import Auditoria from "../pages/auditoria/Auditoria";
+import Incidentes from "../pages/incidentes/Incidentes";
 
 // ============================================================
 // ROUTER PRINCIPAL
@@ -397,6 +398,15 @@ export const router = createBrowserRouter([
       {
         path: "auditoria",
         Component: Auditoria,
+      },
+
+      // ============================================================
+      // INCIDENTES
+      // ============================================================
+
+      {
+        path: "incidentes",
+        Component: Incidentes,
       },
     ],
   },
