@@ -33,6 +33,7 @@ const menuItems = [
   { path: "/marketing", label: "Marketing", icon: UserPlus },
   { path: "/casos-especiales", label: "Casos especiales", icon: AlertTriangle },
   { path: "/auditoria", label: "Auditoría", icon: Shield },
+  { path: "/incidentes", label: "Incidentes", icon: LifeBuoy },
 ];
 
 export function DashboardLayout() {
