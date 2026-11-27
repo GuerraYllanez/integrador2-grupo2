@@ -13,6 +13,7 @@ import {
   SmilePlus,
   GitBranch,
   Clock, CreditCard, Shield,
+  LifeBuoy,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useState } from "react";
