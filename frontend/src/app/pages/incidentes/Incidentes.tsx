@@ -17,9 +17,15 @@ interface Ticket {
   nivel_soporte: string | null;
 }
 
-const API_BASE =
-  (import.meta as { env?: Record<string, string> }).env?.VITE_API_URL ||
-  "http://localhost:8080/api";
+const resolveApiBase = (): string => {
+  const rawUrl =
+    (import.meta as { env?: Record<string, string> }).env?.VITE_API_URL ||
+    "http://localhost:8080/api";
+  const cleaned = rawUrl.trim().replace(/\/+$/, "");
+  return cleaned.endsWith("/api") ? cleaned : `${cleaned}/api`;
+};
+
+const API_BASE = resolveApiBase();
 
 const MODULOS_ODAM = [
   "Autenticación y Usuarios",
