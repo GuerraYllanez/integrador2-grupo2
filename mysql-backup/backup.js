@@ -2,7 +2,11 @@
 import { google } from "googleapis";
 import { spawn } from "node:child_process";
 import { createGzip } from "node:zlib";
-import { createWriteStream, createReadStream } from "node:fs";
+import {
+  createWriteStream,
+  createReadStream
+} from "node:fs";
+import { unlink } from "node:fs/promises";
 import { pipeline } from "node:stream/promises";
 import os from "node:os";
 import path from "node:path";
@@ -39,6 +43,10 @@ const {
 const RETENTION_DAYS = Number(process.env.RETENTION_DAYS || 14);
 const FOLDER_NAME = "BACKUPS_RAILWAY_MYSQL";
 
+if (!Number.isFinite(RETENTION_DAYS) || RETENTION_DAYS < 1) {
+  throw new Error("RETENTION_DAYS debe ser un número mayor que cero");
+}
+
 const auth = new google.auth.OAuth2(
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET
@@ -68,12 +76,49 @@ function getDate() {
   return `${values.year}-${values.month}-${values.day}`;
 }
 
+// Busca carpetas creadas y accesibles por esta aplicación.
+// Si encuentra varias, prioriza la que ya contiene respaldos.
 async function getFolder() {
   if (process.env.GOOGLE_DRIVE_FOLDER_ID) {
+    console.log("Usando carpeta configurada mediante ID.");
     return process.env.GOOGLE_DRIVE_FOLDER_ID;
   }
 
-  const result = await drive.files.create({
+  const result = await drive.files.list({
+    q: `name = '${FOLDER_NAME}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
+    fields: "files(id,name,createdTime)",
+    pageSize: 100,
+    orderBy: "createdTime desc"
+  });
+
+  const folders = result.data.files || [];
+
+  if (folders.length > 0) {
+    let selectedFolder = null;
+    let highestBackupCount = -1;
+
+    for (const folder of folders) {
+      const contents = await drive.files.list({
+        q: `'${folder.id}' in parents and trashed = false and name contains 'mysql-backup-'`,
+        fields: "files(id,name)",
+        pageSize: 100
+      });
+
+      const count = contents.data.files?.length || 0;
+
+      if (count > highestBackupCount) {
+        highestBackupCount = count;
+        selectedFolder = folder;
+      }
+    }
+
+    console.log("Reutilizando carpeta existente:", selectedFolder.name);
+    console.log("Carpeta ID:", selectedFolder.id);
+
+    return selectedFolder.id;
+  }
+
+  const created = await drive.files.create({
     requestBody: {
       name: FOLDER_NAME,
       mimeType: "application/vnd.google-apps.folder"
@@ -81,17 +126,20 @@ async function getFolder() {
     fields: "id,name"
   });
 
-  console.log("Carpeta creada en Drive:", result.data.name);
-  console.log("GOOGLE_DRIVE_FOLDER_ID:", result.data.id);
+  console.log("Carpeta creada:", created.data.name);
+  console.log("Carpeta ID:", created.data.id);
 
-  return result.data.id;
+  return created.data.id;
 }
 
 async function createBackup() {
-  const filename = `mysql-backup-${getDate()}-${randomUUID().slice(0, 8)}.sql.gz`;
+  const filename =
+    `mysql-backup-${getDate()}-${randomUUID().slice(0, 8)}.sql.gz`;
+
   const filepath = path.join(os.tmpdir(), filename);
 
   const args = [
+    "--protocol=TCP",
     "--host", MYSQLHOST,
     "--port", MYSQLPORT,
     "--user", MYSQLUSER,
@@ -139,6 +187,7 @@ async function createBackup() {
     }
 
     console.log("Backup generado:", filename);
+
     return { filename, filepath };
   } catch (error) {
     dump.kill();
@@ -162,28 +211,35 @@ async function uploadBackup(filename, filepath, folderId) {
   });
 
   console.log("Backup subido correctamente:", result.data.name);
-  console.log("Archivo ID:", result.data.id);
+  console.log("Tamaño:", result.data.size, "bytes");
 }
 
 async function cleanOldBackups(folderId) {
   const cutoff = Date.now() - RETENTION_DAYS * 86400000;
 
-  const result = await drive.files.list({
-    q: `'${folderId}' in parents and trashed = false`,
-    fields: "files(id,name,createdTime)",
-    pageSize: 100,
-    orderBy: "createdTime desc"
-  });
+  let pageToken;
 
-  for (const file of result.data.files || []) {
-    if (
-      file.name.startsWith("mysql-backup-") &&
-      new Date(file.createdTime).getTime() < cutoff
-    ) {
-      await drive.files.delete({ fileId: file.id });
-      console.log("Backup antiguo eliminado:", file.name);
+  do {
+    const result = await drive.files.list({
+      q: `'${folderId}' in parents and trashed = false`,
+      fields: "nextPageToken,files(id,name,createdTime)",
+      pageSize: 100,
+      orderBy: "createdTime asc",
+      pageToken
+    });
+
+    for (const file of result.data.files || []) {
+      if (
+        file.name.startsWith("mysql-backup-") &&
+        new Date(file.createdTime).getTime() < cutoff
+      ) {
+        await drive.files.delete({ fileId: file.id });
+        console.log("Backup antiguo eliminado:", file.name);
+      }
     }
-  }
+
+    pageToken = result.data.nextPageToken;
+  } while (pageToken);
 }
 
 async function main() {
@@ -191,8 +247,8 @@ async function main() {
 
   try {
     const folderId = await getFolder();
-    const backup = await createBackup();
 
+    const backup = await createBackup();
     filepath = backup.filepath;
 
     await uploadBackup(
@@ -206,7 +262,6 @@ async function main() {
     console.log("Proceso de backup finalizado correctamente.");
   } finally {
     if (filepath) {
-      const { unlink } = await import("node:fs/promises");
       await unlink(filepath).catch(() => {});
     }
   }
