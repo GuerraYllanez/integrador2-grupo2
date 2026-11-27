@@ -18,7 +18,7 @@ public class TicketController {
     private JdbcTemplate jdbcTemplate;
 
     @GetMapping
-    public ResponseEntity<List>> listarTickets() {
+    public ResponseEntity<List<Map<String, Object>>> listarTickets() {
         String sql = """
                 SELECT
                     t.id_ticket,
@@ -42,7 +42,7 @@ public class TicketController {
                 ORDER BY t.id_ticket DESC
                 """;
 
-        List> tickets = jdbcTemplate.queryForList(sql);
+        List<Map<String, Object>> tickets = jdbcTemplate.queryForList(sql);
         return ResponseEntity.ok(tickets);
     }
 
@@ -139,7 +139,7 @@ public class TicketController {
                     FROM ticket
                     WHERE id_ticket = ?
                     """;
-            List> encontrados = jdbcTemplate.queryForList(selectActual, id);
+            List<Map<String, Object>> encontrados = jdbcTemplate.queryForList(selectActual, id);
             if (encontrados.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("error", "Ticket no encontrado con id: " + id));
