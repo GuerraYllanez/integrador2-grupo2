@@ -18,7 +18,7 @@ public class TicketController {
     private JdbcTemplate jdbcTemplate;
 
     @GetMapping
-    public ResponseEntity<List<Map<String, Object>>> listarTickets() {
+    public ResponseEntity<List>> listarTickets() {
         String sql = """
                 SELECT
                     t.id_ticket,
@@ -42,7 +42,7 @@ public class TicketController {
                 ORDER BY t.id_ticket DESC
                 """;
 
-        List<Map<String, Object>> tickets = jdbcTemplate.queryForList(sql);
+        List> tickets = jdbcTemplate.queryForList(sql);
         return ResponseEntity.ok(tickets);
     }
 
@@ -126,6 +126,93 @@ public class TicketController {
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Error al crear el ticket: " + ex.getMessage()));
+        }
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> actualizarTicket(
+            @PathVariable Integer id,
+            @RequestBody Map<String, Object> body) {
+        try {
+            String selectActual = """
+                    SELECT id_ticket, id_estado, id_asignado_a
+                    FROM ticket
+                    WHERE id_ticket = ?
+                    """;
+            List> encontrados = jdbcTemplate.queryForList(selectActual, id);
+            if (encontrados.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Ticket no encontrado con id: " + id));
+            }
+
+            Map<String, Object> actual = encontrados.get(0);
+            int idEstado = actual.get("id_estado") != null
+                    ? ((Number) actual.get("id_estado")).intValue()
+                    : 1;
+            Integer idAsignadoA = actual.get("id_asignado_a") != null
+                    ? ((Number) actual.get("id_asignado_a")).intValue()
+                    : null;
+
+            Object rawEstado = body.get("id_estado") != null
+                    ? body.get("id_estado")
+                    : body.get("idEstado");
+            if (rawEstado != null && !rawEstado.toString().isBlank()) {
+                idEstado = Integer.parseInt(rawEstado.toString());
+            }
+
+            boolean tieneAsignado = body.containsKey("id_asignado_a") || body.containsKey("idAsignadoA");
+            if (tieneAsignado) {
+                Object rawAsignado = body.containsKey("id_asignado_a")
+                        ? body.get("id_asignado_a")
+                        : body.get("idAsignadoA");
+                if (rawAsignado == null || rawAsignado.toString().isBlank()) {
+                    idAsignadoA = null;
+                } else {
+                    idAsignadoA = Integer.parseInt(rawAsignado.toString());
+                }
+            }
+
+            jdbcTemplate.update(
+                    """
+                    UPDATE ticket
+                    SET id_estado = ?, id_asignado_a = ?
+                    WHERE id_ticket = ?
+                    """,
+                    idEstado, idAsignadoA, id
+            );
+
+            String selectActualizado = """
+                    SELECT
+                        t.id_ticket,
+                        t.codigo,
+                        t.titulo,
+                        t.modulo_afectado,
+                        t.descripcion,
+                        t.fecha_creacion,
+                        t.id_estado,
+                        e.nombre_estado,
+                        t.id_prioridad,
+                        p.nombre_prioridad,
+                        p.tiempo_sla_minutos,
+                        t.id_asignado_a,
+                        a.nombre_responsable,
+                        a.nivel_soporte
+                    FROM ticket t
+                    JOIN estado_ticket e ON t.id_estado = e.id_estado
+                    JOIN prioridad p ON t.id_prioridad = p.id_prioridad
+                    LEFT JOIN asignado_a a ON t.id_asignado_a = a.id_asignado_a
+                    WHERE t.id_ticket = ?
+                    LIMIT 1
+                    """;
+
+            Map<String, Object> actualizado = jdbcTemplate.queryForMap(selectActualizado, id);
+            return ResponseEntity.ok(actualizado);
+        } catch (NumberFormatException ex) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Valores numéricos inválidos en id_estado o id_asignado_a."));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error al actualizar el ticket: " + ex.getMessage()));
         }
     }
 }
