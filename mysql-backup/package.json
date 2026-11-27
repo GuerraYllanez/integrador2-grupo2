@@ -1,0 +1,13 @@
+
+{
+  "name": "railway-mysql-backup",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "backup": "node backup.js"
+  },
+  "dependencies": {
+    "googleapis": "^144.0.0"
+  }
+}
