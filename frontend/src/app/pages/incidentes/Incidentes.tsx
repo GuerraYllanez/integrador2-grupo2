@@ -50,17 +50,33 @@ export default function Incidentes() {
   const [idPrioridad, setIdPrioridad] = useState<number>(2);
   const [descripcion, setDescripcion] = useState("");
 
-  const getAuthHeaders = (): HeadersInit => {
-    const token =
-      localStorage.getItem("token") ||
-      localStorage.getItem("accessToken") ||
-      "";
-    return {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    };
-  };
+const getAuthHeaders = (): HeadersInit => {
+  let token =
+    sessionStorage.getItem("odam_token") ||
+    localStorage.getItem("odam_token") ||
+    localStorage.getItem("token") ||
+    localStorage.getItem("accessToken") ||
+    "";
 
+  if (!token) {
+    const rawAuthUser =
+      sessionStorage.getItem("auth_user") ||
+      localStorage.getItem("auth_user");
+    if (rawAuthUser) {
+      try {
+        const parsed = JSON.parse(rawAuthUser) as { token?: string };
+        token = parsed.token || "";
+      } catch {
+        // Ignorar si no es JSON válido
+      }
+    }
+  }
+
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
   const cargarTickets = async () => {
     try {
       setLoading(true);
